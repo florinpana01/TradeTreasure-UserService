@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import {UserService} from './user.service';
+import {EventPattern} from '@nestjs/microservices';
 
 @Controller('users')
 export class UserController {
@@ -8,6 +9,16 @@ export class UserController {
     @Get()
     async all() {
         return this.userService.all();
+    }
+
+    // @EventPattern('test')
+    // async hello(data: string) {
+    //     console.log(data);
+    // }
+
+    @EventPattern('product_created')
+    async helloNew(product: any){
+
     }
 
     @Post()
