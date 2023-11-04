@@ -6,20 +6,23 @@ import {ClientProxy, EventPattern} from '@nestjs/microservices';
 export class UserController {
 
     constructor(private userService: UserService,
-        @Inject('USER_SERVICE') private client: ClientProxy,) {}
+        @Inject('USER_SERVICE') private readonly client: ClientProxy,) {}
 
         @EventPattern('user_request_all')
         async all() {
             console.log('getting all users');
-            return this.userService.all();
+            return await this.userService.all();
         }
    
+        @EventPattern('test')
+        async hello() {
+            console.log("test");
+        }
 
         @EventPattern('user_created_gateway')
         async register(data) {
             console.log("user_created_gateway data", data);
             const newUser = await this.userService.register(data);
-            this.client.emit('user_created', newUser);
             return newUser;
         }
 
