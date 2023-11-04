@@ -1,64 +1,49 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, Post, Put } from '@nestjs/common';
 import {UserService} from './user.service';
-import {EventPattern} from '@nestjs/microservices';
+import {ClientProxy, EventPattern} from '@nestjs/microservices';
 
 @Controller('users')
 export class UserController {
 
-    constructor(private userService: UserService) {}
-    @Get()
-    async all() {
-        return this.userService.all();
-    }
+    constructor(private userService: UserService,
+        @Inject('USER_SERVICE') private client: ClientProxy,) {}
 
-    // @EventPattern('test')
-    // async hello(data: string) {
-    //     console.log(data);
-    // }
+        @EventPattern('user_request_all')
+        async all() {
+            console.log('getting all users');
+            return this.userService.all();
+        }
+   
 
-    @EventPattern('product_created')
-    async helloNew(product: any){
+        @EventPattern('user_created_gateway')
+        async register(data) {
+            console.log("user_created_gateway data", data);
+            const newUser = await this.userService.register(data);
+            this.client.emit('user_created', newUser);
+            return newUser;
+        }
 
-    }
+        @Get(':id')
+        async get(@Param('id') id: number) {
+            return this.userService.get(id);
+        }
 
-    @Post()
-    async create(
-        @Body('firstName') firstName: string,
-        @Body('lastName') lastName: string,
-        @Body('email') email: string,
-        @Body('password') password: string,
-        ) {
-        return this.userService.create({
-            firstName,
-            lastName,
-            email,
-            password
-        });
-    }
+        @EventPattern('user_updated_gateway')
+        async update(data) {
+            console.log("post_updated_gateway", data);
+            await this.userService.update(data.id, data);
+            const user = await this.userService.get(data.id);
+            console.log("user updated", user);
+            this.client.emit('user_updated', user);
+            return user;
+        }
 
-    @Get(':id')
-    async get(@Param('id') id: number){
-        return this.userService.get(id);
-    }
-
-    @Put(':id')
-    async update(
-        @Param('id') id: number,
-        @Body('firstName') firstName: string,
-        @Body('lastName') lastName: string,
-        @Body('email') email: string,
-        @Body('password') password: string,
-    ){
-        return this.userService.update(id, {
-            firstName,
-            lastName,
-            email,
-            password
-        });
-    }
-
-    @Delete(':id')
-    async delete(@Param('id') id: number) {
-        return this.userService.delete(id);
-    }
+        @EventPattern('user_deleted_gateway')
+        async delete(id) {
+            console.log("user deleted id", id);
+            this.userService.delete(id);
+            this.client.emit('user_deleted', id);
+            return HttpStatus.NO_CONTENT;
+            
+        }
 }
