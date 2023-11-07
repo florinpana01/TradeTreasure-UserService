@@ -26,14 +26,16 @@ export class UserController {
             return newUser;
         }
 
-        @Get(':id')
+        @EventPattern('user_request_single')
         async get(@Param('id') id: number) {
-            return this.userService.get(id);
+            console.log("getting requested user, ", id);
+            const requestedUser = await this.userService.get(id);
+            return requestedUser;
         }
 
         @EventPattern('user_updated_gateway')
         async update(data) {
-            console.log("post_updated_gateway", data);
+            console.log("user_updated_gateway", data);
             await this.userService.update(data.id, data);
             const user = await this.userService.get(data.id);
             console.log("user updated", user);
