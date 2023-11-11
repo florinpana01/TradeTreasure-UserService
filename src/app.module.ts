@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import { FollowController } from './follow/follow.controller';
+import { FollowService } from './follow/follow.service';
+import { FollowModule } from './follow/follow.module';
 
 
 @Module({
@@ -17,8 +20,9 @@ import {TypeOrmModule} from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    UserModule],
-  controllers: [AppController],
-  providers: [AppService],
+    UserModule,
+    FollowModule],
+  controllers: [AppController, FollowController],
+  providers: [AppService, FollowService],
 })
 export class AppModule {}
