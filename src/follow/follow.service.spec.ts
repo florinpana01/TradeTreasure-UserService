@@ -1,18 +1,44 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { FollowService } from './follow.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import { Follow } from "./follow.entity";
+import { FollowService } from "./follow.service";
+
 
 describe('FollowService', () => {
-  let service: FollowService;
+    let service: FollowService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [FollowService],
-    }).compile();
+    const mockFollowRepository = {
+        save: jest.fn().mockImplementation((follow: Follow) => Promise.resolve(follow)),
+        update: jest.fn().mockImplementation((id, data) => ({id, ...data})),
+        find: jest.fn().mockImplementation(() => Promise.resolve([])),
+        findOne: jest.fn().mockImplementation((id) => Promise.resolve({
+            followerId: 1,
+            followedId: 2,
+        }))
+    }
 
-    service = module.get<FollowService>(FollowService);
-  });
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [FollowService, {
+                provide: getRepositoryToken(Follow),
+                useValue: mockFollowRepository
+            }],
+        }).compile();
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+        service = module.get<FollowService>(FollowService);
+    });
+
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+    });
+
+    it('should create a new follow', async () => {
+        const data = {
+            followerId: 1,
+            followedId: 2,
+        }
+
+        const savedFollow = await service.create(data);
+        expect(savedFollow).toBeDefined();
+    });
+})
