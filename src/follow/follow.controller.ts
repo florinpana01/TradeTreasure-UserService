@@ -15,7 +15,7 @@ export class FollowController {
     async create(data) {
         console.log("follow_created_gateway data", data);
         const follow = await this.followService.create(data);
-        this.client.emit('follow_created', follow);
+        // this.client.emit('follow_created_gateway', follow);
         return follow;
     }
 
@@ -30,7 +30,7 @@ export class FollowController {
         await this.followService.update(data.id, data);
         const follow = await this.followService.get(data.id);
         console.log("follow updated", follow);
-        this.client.emit('follow_updated', follow);
+        // this.client.emit('follow_updated_gateway', follow);
         return follow;
     }
 
@@ -39,7 +39,7 @@ export class FollowController {
     async delete(id) {
         console.log("follow deleted id", id);
         this.followService.delete(id);
-        this.client.emit('follow_deleted', id);
+        // this.client.emit('follow_deleted_gateway', id);
         return HttpStatus.NO_CONTENT;
         
     }

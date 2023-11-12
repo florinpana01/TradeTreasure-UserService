@@ -22,7 +22,7 @@ import { FollowModule } from './follow/follow.module';
     }),
     UserModule,
     FollowModule],
-  controllers: [AppController, FollowController],
-  providers: [AppService, FollowService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
