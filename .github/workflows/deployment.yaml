@@ -1,0 +1,22 @@
+name : User Service
+
+on: 
+  push:
+    branches:   
+    - 'main'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install
+        run: npm i
+      - name: test
+        run: npm test
+
