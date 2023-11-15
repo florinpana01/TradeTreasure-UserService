@@ -27,9 +27,9 @@ export class UserController {
         }
 
         @EventPattern('user_request_single')
-        async get(@Param('id') id: number) {
+        async findOneBy(id: number) {
             console.log("getting requested user, ", id);
-            const requestedUser = await this.userService.get(id);
+            const requestedUser = await this.userService.findOneBy(id);
             return requestedUser;
         }
 
@@ -37,7 +37,7 @@ export class UserController {
         async update(data) {
             console.log("user_updated_gateway", data);
             await this.userService.update(data.id, data);
-            const user = await this.userService.get(data.id);
+            const user = await this.userService.findOneBy(data.id);
             console.log("user updated", user);
             this.client.emit('user_updated', user);
             return user;

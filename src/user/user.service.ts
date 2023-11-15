@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {User} from './user.entity';
+import {log} from 'console';
 
 @Injectable()
 export class UserService {
@@ -22,7 +23,10 @@ export class UserService {
         return this.userRepository.findOne({where: condition});
     }
 
-    async get(id: number): Promise<User> {
+    async findOneBy(id: number): Promise<User> {
+        console.log("received id: ", id);
+        var response = await this.userRepository.findOneBy({id});
+        console.log("response is: ", response);
         return this.userRepository.findOneBy({id});
     }
 
