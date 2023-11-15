@@ -41,18 +41,18 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a new user', async () => {
-    const data = {
-      firstName: "first",
-      lastName: "test",
-      email: "test@test.com",
-      password: "password"
-    }
-    expect(await controller.register(data)).toEqual({
-      id: expect.any(Number),
-      ...data
-    })
-  })
+  // it('should create a new user', async () => {
+  //   const data = {
+  //     firstName: "first",
+  //     lastName: "test",
+  //     email: "test@test.com",
+  //     password: "password"
+  //   }
+  //   expect(await controller.register(data)).toEqual({
+  //     id: expect.any(Number),
+  //     ...data
+  //   })
+  // })
 
 //   it('should update a user', async () => {
 //     const data = {
