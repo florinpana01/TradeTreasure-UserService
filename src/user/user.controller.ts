@@ -39,7 +39,7 @@ export class UserController {
             await this.userService.update(data.id, data);
             const user = await this.userService.findOneBy(data.id);
             console.log("user updated", user);
-            this.client.emit('user_updated', user);
+            // this.client.emit('user_updated', user);
             return user;
         }
 
@@ -47,7 +47,7 @@ export class UserController {
         async delete(id) {
             console.log("user deleted id", id);
             this.userService.delete(id);
-            this.client.emit('user_deleted', id);
+            // this.client.emit('user_deleted', id);
             return HttpStatus.NO_CONTENT;
             
         }
