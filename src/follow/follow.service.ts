@@ -18,7 +18,13 @@ async create(data): Promise<Follow>{
     return this.FollowRepository.save(data);
 }
 
-async get(id: number): Promise<Follow> {
+// async get(id: number): Promise<Follow> {
+//     return this.FollowRepository.findOneBy({id});
+// }
+async findOneBy(id: number): Promise<Follow> {
+    console.log("received id: ", id);
+    var response = await this.FollowRepository.findOneBy({id});
+    console.log("response is: ", response);
     return this.FollowRepository.findOneBy({id});
 }
 

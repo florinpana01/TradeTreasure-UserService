@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, Post, Put } f
 import { ClientProxy, EventPattern } from '@nestjs/microservices';
 import { FollowService } from './follow.service';
 
-@Controller('follow')
+@Controller('follows')
 export class FollowController {
     constructor(private followService: FollowService,
         @Inject('FOLLOW_SERVICE') private client: ClientProxy,
@@ -10,6 +10,11 @@ export class FollowController {
 
     }
 
+    @EventPattern('follow_request_all')
+    async all() {
+        console.log('getting all follows');
+            return this.followService.all();
+    }
     
     @EventPattern('follow_created_gateway')
     async create(data) {
@@ -19,20 +24,22 @@ export class FollowController {
         return follow;
     }
 
-    @Get(':id')
-    async get(@Param('id') id: number) {
-        return this.followService.get(id);
+    @EventPattern('follow_request_single')
+    async findOneBy(id: number) {
+        console.log("getting requested follow, ", id);
+        const requestedFollow = await this.followService.findOneBy(id);
+        return requestedFollow;
     }
 
-    @EventPattern('follow_updated_gateway')
-    async update(data) {
-        console.log("follow_updated_gateway", data);
-        await this.followService.update(data.id, data);
-        const follow = await this.followService.get(data.id);
-        console.log("follow updated", follow);
-        // this.client.emit('follow_updated_gateway', follow);
-        return follow;
-    }
+    // @EventPattern('follow_updated_gateway')
+    // async update(data) {
+    //     console.log("follow_updated_gateway", data);
+    //     await this.followService.update(data.id, data);
+    //     const follow = await this.followService.findOneBy(data.id);
+    //     console.log("follow updated", follow);
+    //     // this.client.emit('user_updated', user);
+    //     return follow;
+    // }
 
 
     @EventPattern('follow_deleted_gateway')
