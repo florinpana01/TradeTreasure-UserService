@@ -12,11 +12,13 @@ import { FollowModule } from './follow/follow.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '35.233.2.49',
+      //host: '35.233.2.49',
+      host: 'localhost',
       port: 3306,
       username: 'root',
       password: 'Totamealand1983',
-      database: 'tradetreasure-users',
+      //database: 'tradetreasure-users',
+      database: 'tt-users',
       autoLoadEntities: true,
       synchronize: true,
     }),
