@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {User} from './user.entity';
@@ -6,13 +6,13 @@ import {log} from 'console';
 import * as admin from 'firebase-admin';
 import * as bcrypt from 'bcrypt';
 
-// Initialize Firebase Admin SDK with your private key
-const path = require('path');
-const serviceAccount = require(path.resolve(__dirname, '../../serviceAccountKey.json'));
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // Add other configurations if necessary
-});
+// // Initialize Firebase Admin SDK with your private key
+// const path = require('path');
+// const serviceAccount = require(path.resolve(__dirname, '../../serviceAccountKey.json'));
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   // Add other configurations if necessary
+// });
 
 
 @Injectable()
@@ -34,49 +34,34 @@ export class UserService {
       
         return user;
       }
+
+    async findRoleByEmail(email: string): Promise<string| null> {
+        const user = await this.userRepository.findOne({where: {email}});
+        if (!user) {
+            throw new NotFoundException('User not found');
+          }
+          return user.role;
+    }
     
 
-    async register(data): Promise<User> {
-        // Create user in your MySQL database
-        const newUser = await this.userRepository.save(data);
-    
-        // Call the method to create user in Firebase
-        //await this.createFirebaseUser(data.email, data.password);
-    
-        return newUser;
-      }
-
-
-    //   async createFirebaseUser(email: string, password: string): Promise<void> {
-    //     try {
-    //       // Initialize Firebase Admin SDK (Ensure it's initialized before using any Firebase services)
-    //       if (!admin.apps.length) {
-    //         admin.initializeApp({
-    //           credential: admin.credential.cert(serviceAccount),
-    //           // Add other configurations if necessary
-    //         });
-    //       }
-      
-    //       console.log('Creating Firebase user for email:', email);
-      
-    //       // Check if the user already exists in Firebase
-    //       const userRecord = await admin.auth().getUserByEmail(email);
-    //       if (userRecord) {
-    //         console.log('Firebase user already exists:', userRecord.uid);
-    //         // Handle accordingly, e.g., return an error or skip creating the user
-    //       } else {
-    //         // If not, create the user in Firebase
-    //         await admin.auth().createUser({
-    //           email,
-    //           password,
-    //         });
-    //         console.log(`Firebase user created for email: ${email}`);
-    //       }
-    //     } catch (error) {
-    //       console.error(`Error creating Firebase user: ${error}`);
-    //     }
+    // async register(data): Promise<User> {
+    //     const newUser = await this.userRepository.save(data);
+    //     return newUser;
     //   }
-      
+    async register(data): Promise<User> {
+        // Validate and set default role
+        if(!data.role) {
+            data.role='user';
+        }
+        if (data.role !== 'user' && data.role !== 'admin') {
+            throw new BadRequestException('Invalid or missing user role');
+        }
+        const newUser = await this.userRepository.save({
+            ...data,
+            role: data.role || 'user', // Set default role to 'user' if not provided
+        });
+        return newUser;
+    }
 
     async findOne(condition: any): Promise<User> {
         return this.userRepository.findOne({where: condition});
@@ -93,7 +78,20 @@ export class UserService {
         return this.userRepository.update(id, data);
     }
     
-    async delete(id: number): Promise<any> {
-        return this.userRepository.delete(id);
-    }
+    async delete(email: string, deleterEmail: string): Promise<any> {
+        const userToDelete = await this.findByEmail(email);
+        const userThatDeletes = await this.findByEmail(deleterEmail);
+        console.log('User to delete:', userToDelete);
+        console.log('Deleter email:', deleterEmail);
+      
+        if (userThatDeletes && userToDelete) {
+          if (userThatDeletes.role !== 'admin') {
+            throw new BadRequestException('You are not authorized to delete this user');
+          }
+        } else {
+          throw new BadRequestException('Invalid data');
+        }
+      
+        return this.userRepository.delete(email);
+      }
     }

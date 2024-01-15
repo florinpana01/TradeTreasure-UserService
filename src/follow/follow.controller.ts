@@ -20,7 +20,6 @@ export class FollowController {
     async create(data) {
         console.log("follow_created_gateway data", data);
         const follow = await this.followService.create(data);
-        // this.client.emit('follow_created_gateway', follow);
         return follow;
     }
 

@@ -24,6 +24,13 @@ export class UserController {
   @EventPattern('user_request_by_email')
   async findByEmail(@Payload() data: { email: string }) {
     const user = await this.userService.findByEmail(data.email);
+    console.log(user.email, ': ', user.role);
+    return user;
+  }
+
+  @EventPattern('user_role_request_by_email')
+  async findRoleByEmail(@Payload() data: { email: string }) {
+    const user = await this.userService.findRoleByEmail(data.email);
     return user;
   }
 
@@ -31,10 +38,6 @@ export class UserController {
   async register(data) {
     console.log('user_created_gateway data', data);
     const newUser = await this.userService.register(data);
-
-    // Add the logic to create a Firebase user
-    //await this.userService.createFirebaseUser(newUser.email, newUser.password);
-
     return newUser;
   }
 
@@ -56,10 +59,10 @@ export class UserController {
   }
 
   @EventPattern('user_deleted_gateway')
-  async delete(id) {
-    console.log('user deleted id', id);
-    this.userService.delete(id);
-    // this.client.emit('user_deleted', id);
+  async delete(@Payload() data: { email: string, deleterEmail: string }) {
+    console.log('user deleted email', data.email);
+    await this.userService.delete(data.email, data.deleterEmail);
     return HttpStatus.NO_CONTENT;
   }
+  
 }

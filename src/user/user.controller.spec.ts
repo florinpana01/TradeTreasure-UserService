@@ -74,6 +74,9 @@ describe('UserController', () => {
     })
   })
   it('should delete a user', async () => {
-    expect(await controller.delete(1)).toEqual(HttpStatus.NO_CONTENT)
-  })
+    const userId = 1;
+    const userRole = 'user'; // Provide the user's role here
+    expect(await controller.delete({ id: userId, role: userRole })).toEqual(HttpStatus.NO_CONTENT);
+  });  
+  
 });

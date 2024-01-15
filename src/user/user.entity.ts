@@ -19,4 +19,11 @@ export class User {
 
     @Column({default: 0})
     followers: number;
+    
+    @Column({
+        type: "enum",
+        enum: ["user", "admin"],
+        default: "user"
+    })
+    role: string;
 }
