@@ -37,5 +37,3 @@ jobs:
          context: ./
          push: true
          tags: florinpana01/tradetreasure-user-service-repository
-      
-      
