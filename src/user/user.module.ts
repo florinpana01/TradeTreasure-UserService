@@ -7,17 +7,6 @@ import {ClientsModule, Transport} from '@nestjs/microservices';
 
 @Module({
     imports: [
-        // TypeOrmModule.forRoot({
-        //     type: 'mysql',
-        //     host: 'localhost',
-        //     port: 3306,
-        //     username: 'root',
-        //     password: 'Totamealand1983',
-        //     database: 'tt-users',
-        //     autoLoadEntities: true,
-        //     synchronize: true,
-        //   }),
-          // UserModule,
           TypeOrmModule.forFeature([User]),
           ClientsModule.register([{
             name: 'USER_SERVICE',

@@ -12,7 +12,8 @@ import { FollowModule } from './follow/follow.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '35.233.2.49',
+      //host: 'localhost',
       //host: '127.0.0.1',
       //port: 1234,
       port: 3306,
