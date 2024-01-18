@@ -55,7 +55,7 @@ jobs:
         gcloud components install gke-gcloud-auth-plugin
         gcloud components update
         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-        gcloud container clusters get-credentials autopilot-cluster-1 --region europe-west1 --project even-envoy-369215
+        gcloud container clusters get-credentials autopilot-cluster-1 --region europe-west1 --project praxis-bond-405913
       
     - name: Deploy
       run: |-
