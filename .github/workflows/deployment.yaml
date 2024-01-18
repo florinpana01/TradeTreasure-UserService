@@ -59,7 +59,5 @@ jobs:
       
     - name: Deploy
       run: |-
-        cd ..
-        cd ..
         cd k8s
         kubectl apply -f deployment.yaml
