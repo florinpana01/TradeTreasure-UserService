@@ -34,7 +34,7 @@ describe('UserController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ClientsModule.register([
         {
-          name: 'USER_SERVICE',
+          name: 'PRODUCT_SERVICE',
           transport: Transport.RMQ
         }
       ])],
