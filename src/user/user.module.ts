@@ -9,11 +9,11 @@ import {ClientsModule, Transport} from '@nestjs/microservices';
     imports: [
           TypeOrmModule.forFeature([User]),
           ClientsModule.register([{
-            name: 'USER_SERVICE',
+            name: 'PRODUCT_SERVICE',
             transport: Transport.RMQ,
             options: {
               urls: ['amqps://pjfufoya:LuO22_OIV_SIcvDewsRCbu_nTAUooYvt@kangaroo.rmq.cloudamqp.com/pjfufoya'],
-              queue: 'users-queue-gateway',
+              queue: 'products-queue-gateway',
               queueOptions: {
                 durable: false
               },

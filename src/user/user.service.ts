@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {User} from './user.entity';
@@ -17,8 +17,8 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-    constructor(
-        @InjectRepository(User) private readonly userRepository: Repository<User>
+    constructor(  
+      @InjectRepository(User) private readonly userRepository: Repository<User>
     ){  
     }
     async all(): Promise<User[]> {
@@ -53,15 +53,25 @@ export class UserService {
         if(!data.role) {
             data.role='user';
         }
-        if (data.role !== 'user' && data.role !== 'admin') {
+        if (data.role !== 'user') {
             throw new BadRequestException('Invalid or missing user role');
         }
+        //this.validatePassword(data.password);
+
         const newUser = await this.userRepository.save({
             ...data,
             role: data.role || 'user', // Set default role to 'user' if not provided
         });
         return newUser;
     }
+    
+    // private validatePassword(password: string): void {
+    //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+      
+    //   if (!passwordRegex.test(password)) {
+    //     throw new BadRequestException('Invalid password. It must have at least 12 characters, one lowercase letter, one uppercase letter, one number, and one special character.');
+    //   }
+    // }
 
     async findOne(condition: any): Promise<User> {
         return this.userRepository.findOne({where: condition});
@@ -78,20 +88,17 @@ export class UserService {
         return this.userRepository.update(id, data);
     }
     
-    async delete(email: string, deleterEmail: string): Promise<any> {
-        const userToDelete = await this.findByEmail(email);
-        const userThatDeletes = await this.findByEmail(deleterEmail);
-        console.log('User to delete:', userToDelete);
-        console.log('Deleter email:', deleterEmail);
-      
-        if (userThatDeletes && userToDelete) {
-          if (userThatDeletes.role !== 'admin') {
-            throw new BadRequestException('You are not authorized to delete this user');
-          }
-        } else {
-          throw new BadRequestException('Invalid data');
-        }
-      
-        return this.userRepository.delete(email);
+    async delete(email: string): Promise<void> {
+      const userToDelete = await this.findByEmail(email);
+  
+      if (!userToDelete) {
+        throw new NotFoundException('User not found');
       }
+  
+      try {
+        await this.userRepository.remove(userToDelete);
+      } catch (error) {
+        throw new InternalServerErrorException('Error deleting user');
+      }
+    }
     }

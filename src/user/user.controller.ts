@@ -7,7 +7,9 @@ export class UserController {
 
   constructor(
     private userService: UserService,
-    @Inject('USER_SERVICE') private readonly client: ClientProxy,
+    // @Inject('USER_SERVICE') private readonly client: ClientProxy,
+    @Inject('PRODUCT_SERVICE') private clientProduct: ClientProxy,
+
   ) {}
 
   @EventPattern('user_request_all')
@@ -59,9 +61,15 @@ export class UserController {
   }
 
   @EventPattern('user_deleted_gateway')
-  async delete(@Payload() data: { email: string, deleterEmail: string }) {
+  async delete(@Payload() data: { email: string }) {
     console.log('user deleted email', data.email);
-    await this.userService.delete(data.email, data.deleterEmail);
+
+    // Call the UserService to delete the user
+    await this.userService.delete(data.email);
+
+    // Emit an event to notify other microservices about user deletion
+    this.clientProduct.emit('user_deleted', data.email);
+
     return HttpStatus.NO_CONTENT;
   }
   
